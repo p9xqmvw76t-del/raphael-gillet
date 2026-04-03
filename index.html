@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raphaël Gillet — Histoire de l'Art & Marché de l'Art</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* PALETTE PRINCIPALE : Blanc Crème & Vert Sapin/Sauge */
+  --cream: #FAF8F5;       /* Fond principal : Blanc crème lumineux */
+  --cream2: #F0EDE6;      /* Fond secondaire : Crème légèrement plus soutenu */
+  --green: #4A7059;       /* Accent : Vert sauge / sapin doux */
+  --green-dark: #2D4A3A;  /* Accent hover : Vert sapin profond */
+  --green-light: rgba(74, 112, 89, 0.08); /* Fond léger accentué */
+  
+  --ink: #1B2D22;         /* Texte principal : Vert très sombre (très lisible) */
+  --ink2: #3E5C4A;        /* Texte secondaire : Vert sapin moyen */
+  --ink3: #7A8F83;        /* Texte tertiaire : Vert sauge grisé */
+  
+  --line: rgba(27, 45, 34, 0.15); /* Lignes séparatrices */
+  --line2: rgba(27, 45, 34, 0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* CURSOR */
+#cursor {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform .15s ease, background .2s;
+  mix-blend-mode: multiply;
+}
+#cursor-ring {
+  position: fixed;
+  width: 32px; height: 32px;
+  border: 1px solid var(--green);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transition: transform .4s ease, width .2s, height .2s, border-color .2s;
+  mix-blend-mode: multiply;
+}
+body.hover-mode #cursor { transform: translate(-50%,-50%) scale(2.5); background: var(--green-dark); }
+body.hover-mode #cursor-ring { width: 48px; height: 48px; border-color: var(--green-dark); }
+
+/* NAV (MODIFIÉ THEME SOMBRE) */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4rem 3rem;
+  background: rgba(10, 20, 15, 0.95); /* Vert sapin très foncé (comme le footer) */
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .3s;
+}
+nav.scrolled { border-bottom-color: rgba(250, 248, 245, 0.1); }
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--cream); /* Blanc crème pour contraster */
+  text-decoration: none;
+}
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a {
+  font-size: .75rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(250, 248, 245, 0.6); /* Crème adouci */
+  text-decoration: none;
+  transition: color .3s;
+  font-weight: 400;
+}
+.nav-links a:hover { color: var(--green); }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr; 
+  padding-top: 5rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, var(--green-light));
+  z-index: 0;
+}
+
+/* Grain overlay subtil */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-left {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 2rem 4rem 3rem;
+}
+
+.hero-eyebrow {
+  font-size: .7rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 400;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp .8s .2s forwards;
+}
+
+.hero-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(4rem, 9vw, 8.5rem);
+  font-weight: 300;
+  line-height: .9;
+  color: var(--ink);
+  opacity: 0;
+  animation: fadeUp .9s .35s forwards;
+  letter-spacing: -0.02em;
+}
+.hero-name strong {
+  font-weight: 500;
+  display: block;
+}
+
+.hero-divider {
+  width: 60px;
+  height: 1px;
+  background: var(--green);
+  margin: 2.5rem 0;
+  opacity: 0;
+  animation: fadeUp .7s .55s forwards;
+}
+
+.hero-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  color: var(--ink2);
+  max-width: 32ch;
+  line-height: 1.5;
+  opacity: 0;
+  animation: fadeUp .8s .65s forwards;
+}
+
+.hero-contacts {
+  margin-top: 3.5rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2rem;
+  opacity: 0;
+  animation: fadeUp .8s .8s forwards;
+}
+.hero-contact-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  font-size: .8rem;
+  color: var(--ink2);
+  letter-spacing: .05em;
+  text-decoration: none;
+  transition: color .3s;
+}
+.hero-contact-item:hover { color: var(--green-dark); }
+.hero-contact-item svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 1.5; flex-shrink: 0; }
+
+.hero-scroll {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 3rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  opacity: 0;
+  animation: fadeUp .6s 1.1s forwards;
+}
+.hero-scroll-line {
+  width: 50px; height: 1px;
+  background: var(--line);
+  position: relative;
+  overflow: hidden;
+}
+.hero-scroll-line::after {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0; height: 100%; width: 100%;
+  background: var(--green);
+  animation: scrollLine 2s 1.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* Hero right */
+.hero-right {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: flex-end;   
+  padding: 4rem 4rem 4rem 2rem;
+  text-align: right;
+  border-left: 1px solid var(--line2);
+}
+.hero-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(10rem, 20vw, 22rem);
+  font-weight: 300;
+  line-height: 0.8;
+  color: rgba(27, 45, 34, 0.04);
+  position: absolute;
+  top: 50%; 
+  right: -2rem;
+  transform: translateY(-50%);
+  z-index: 1;
+  user-select: none;
+  opacity: 0;
+  animation: fadeIn 1.5s .4s forwards;
+}
+
+.hero-right-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-label {
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeUp .7s .7s forwards;
+}
+.hero-label-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--green-dark);
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp .7s .8s forwards;
+}
+
+/* SECTIONS */
+section {
+  padding: 8rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 5rem;
+}
+.section-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--green);
+  letter-spacing: .05em;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.section-line { flex: 1; height: 1px; background: var(--line); }
+
+/* ABOUT */
+#about { background: var(--cream); }
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 6rem;
+  align-items: start;
+}
+.about-text p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--ink2);
+}
+.about-text p::first-letter {
+  font-size: 4rem;
+  font-weight: 300;
+  line-height: .8;
+  float: left;
+  margin-right: .15em;
+  margin-top: .05em;
+  color: var(--green);
+  font-family: 'Cormorant Garamond', serif;
+}
+.about-aside {
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+.aside-item {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--line2);
+}
+.aside-label {
+  font-size: .65rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: .6rem;
+  font-weight: 400;
+}
+.aside-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+/* EXPERIENCE */
+#experience { background: var(--cream2); }
+.exp-list { display: flex; flex-direction: column; gap: 0; }
+
+.exp-item {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0 4rem;
+  position: relative;
+  padding: 3.5rem 0;
+  border-bottom: 1px solid var(--line);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .8s ease-out, transform .8s ease-out;
+}
+.exp-item.visible { opacity: 1; transform: none; }
+.exp-item:first-child { border-top: 1px solid var(--line); }
+
+.exp-date {
+  font-size: .8rem;
+  color: var(--ink3);
+  letter-spacing: .1em;
+  padding-top: .4rem;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+.exp-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  margin-right: .8rem;
+  flex-shrink: 0;
+}
+.exp-content {}
+.exp-role {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: .4rem;
+  line-height: 1.2;
+}
+.exp-org {
+  font-size: .85rem;
+  color: var(--green);
+  letter-spacing: .08em;
+  font-weight: 400;
+  margin-bottom: 1.2rem;
+  text-transform: uppercase;
+}
+.exp-desc {
+  font-size: 1rem;
+  color: var(--ink2);
+  line-height: 1.8;
+  max-width: 60ch;
+}
+.exp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.5rem;
+}
+.exp-tag {
+  font-size: .65rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid rgba(74, 112, 89, 0.3);
+  border-radius: 30px; 
+  color: var(--green-dark);
+  font-weight: 400;
+  transition: background .3s;
+}
+.exp-tag:hover {
+  background: var(--green-light);
+}
+
+/* FORMATION */
+#formation { background: var(--cream); }
+.formation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.formation-item {
+  background: var(--cream);
+  padding: 3rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .6s, transform .6s, background .4s;
+}
+.formation-item.visible { opacity: 1; transform: none; }
+.formation-item:hover { background: var(--cream2); }
+.formation-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 0;
+  background: var(--green);
+  transition: height .5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.formation-item:hover::before { height: 100%; }
+.formation-year {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem;
+  font-weight: 300;
+  color: rgba(27, 45, 34, 0.05);
+  line-height: 1;
+  margin-bottom: 1.5rem;
+}
+.formation-degree {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: .6rem;
+  line-height: 1.3;
+}
+.formation-spec {
+  font-size: .85rem;
+  color: var(--ink2);
+  margin-bottom: 1.2rem;
+  line-height: 1.6;
+}
+.formation-school {
+  font-size: .7rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 400;
+}
+
+/* COMPÉTENCES */
+#competences { background: var(--cream2); }
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4rem;
+}
+.comp-col {}
+.comp-col-title {
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 400;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(74, 112, 89, 0.2);
+}
+.comp-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+.comp-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--ink2);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+}
+.comp-item::before {
+  content: '';
+  width: 20px; height: 1px;
+  background: var(--green);
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+/* CONTACT (THEME SOMBRE) */
+#contact {
+  background: #0A140F; /* Vert sapin très foncé proche du noir */
+  padding: 8rem 3rem;
+  max-width: none;
+}
+#contact .section-title {
+  color: var(--cream);
+}
+#contact .section-line {
+  background: rgba(250, 248, 245, 0.1);
+}
+.contact-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 6rem;
+  align-items: center;
+}
+.contact-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(250, 248, 245, 0.85); /* Crème adouci */
+  line-height: 1.6;
+  max-width: 32ch;
+}
+.contact-links { display: flex; flex-direction: column; gap: 2rem; }
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-decoration: none;
+  color: var(--cream); /* Blanc/Crème */
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(250, 248, 245, 0.15); /* Ligne subtile claire */
+  padding-bottom: 2rem;
+  transition: color .3s, border-color .3s;
+}
+.contact-link:hover { color: var(--green); border-color: var(--green); }
+.contact-link:last-child { border: none; padding: 0; }
+.contact-link svg { width: 18px; height: 18px; stroke: var(--green); fill: none; stroke-width: 1.5; flex-shrink: 0; }
+.contact-link-label { font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(250, 248, 245, 0.5); display: block; margin-bottom: .4rem; }
+
+/* FOOTER (THEME SOMBRE) */
+footer {
+  background: #0A140F;
+  padding: 2.5rem 3rem;
+  border-top: 1px solid rgba(250, 248, 245, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: none;
+}
+.footer-copy {
+  font-size: .75rem;
+  color: rgba(250, 248, 245, 0.4);
+  letter-spacing: .1em;
+}
+.footer-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--green);
+  font-style: italic;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scrollLine {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; min-height: auto; padding: 7rem 1.5rem 4rem; }
+  .hero::before { display: none; }
+  .hero-right { display: none; }
+  .hero-name { font-size: 3.5rem; }
+  .hero-contacts { flex-direction: column; gap: 1rem; }
+  section { padding: 5rem 1.5rem; }
+  .about-grid, .comp-grid, .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .formation-grid { grid-template-columns: 1fr; }
+  .exp-item { grid-template-columns: 1fr; padding: 2.5rem 0; gap: 1.5rem;}
+  .exp-date { padding-top: 0; }
+  #contact { padding: 5rem 1.5rem; }
+  footer { flex-direction: column; gap: 1rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav id="nav">
+  <a href="#hero" class="nav-logo">R.Gillet</a>
+  <ul class="nav-links">
+    <li><a href="#about">Profil</a></li>
+    <li><a href="#experience">Expériences</a></li>
+    <li><a href="#formation">Formation</a></li>
+    <li><a href="#competences">Compétences</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="hero" id="hero">
+  <div class="hero-left">
+    
+    <div class="hero-eyebrow">Présentation · 2026</div>
+    <h1 class="hero-name">
+      Raphaël<br>
+      <strong>Gillet</strong>
+    </h1>
+    <div class="hero-divider"></div>
+    <p class="hero-tagline">Diplômé de licence en Histoire de l'Art et prochainement étudiant de Mastère Marché de l'Art international.</p>
+
+    <div class="hero-contacts">
+      <a href="tel:0695990163" class="hero-contact-item">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        06 95 99 01 63
+      </a>
+      <a href="mailto:gillet.raphael.45@gmail.com" class="hero-contact-item">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        gillet.raphael.45@gmail.com
+      </a>
+      <a href="#" class="hero-contact-item">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Orléans — Paris
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-number">RG</div>
+    <div class="hero-right-content">
+      <div class="hero-label">Prochaine étape</div>
+      <div class="hero-label-value">Mastère Marché de l'Art<br>IESA Paris — 2026</div>
+      <div class="hero-label">Septembre 2026</div>
+      <div class="hero-label-value">Recherche d'alternance<br>Paris et région parisienne</div>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    Venez en apprendre plus :
+  </div>
+</div>
+
+<section id="about">
+  <div class="section-label">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Motivé par la passion</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>“Dès mon plus jeune âge, j'ai été émerveillé par des œuvres exceptionnelles, des châteaux de la Loire aux toiles de Véronèse, que j'admirais sans même en saisir toute la complexité. Au fil de mes études, mon projet professionnel s'est naturellement affiné. 
+        Si je me suis d'abord tourné vers un cursus plus conventionnel en droit, j'ai très vite réalisé que je voulais évoluer dans un domaine qui me correspond véritablement. C'est pourquoi j'ai intégré la licence en Histoire de l'Art et Archéologie de Rennes, dont la spécialité est tournée vers la production artistique italienne, une aire géographique qui m'est particulièrement chère.<br><br>
+Aujourd'hui, je me prépare à intégrer un Mastère en Marché de l'Art afin d'allier expertise historique et valorisation d'un patrimoine d'exception. J'apprécie grandement la dimension économique et commerciale de ce secteur, même si ma vocation première reste avant tout la promotion et la diffusion de l'art auprès du plus grand nombre.”</p>
+    </div>
+    <div class="about-aside">
+      <div class="aside-item">
+        <div class="aside-label">Spécialisation</div>
+        <div class="aside-value">Art · Architecture · Histoire<br>Production ancienne & contemporaine</div>
+      </div>
+      <div class="aside-item">
+        <div class="aside-label">Certification</div>
+        <div class="aside-value">Certificat LVMH</div>
+      </div>
+      <div class="aside-item">
+        <div class="aside-label">Domaines recherchés</div>
+        <div class="aside-value">Maison de ventes · Cabinet d'expertise · Communication artistique</div>
+      </div>
+      <div class="aside-item">
+        <div class="aside-label">Mobilité</div>
+        <div class="aside-value">Orléans · Paris</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="section-label">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Expériences</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="exp-list">
+
+    <div class="exp-item reveal">
+      <div class="exp-date"><span class="exp-dot"></span>Mai – Juil. 2026</div>
+      <div class="exp-content">
+        <div class="exp-role">Assistant commissaire-priseur</div>
+        <div class="exp-org">Philocale · Saint-Jean-de-la-Ruelle (45)</div>
+        <div class="exp-desc">Sous la direction de M. Matthieu Semont, commissaire-priseur. Assistance aux inventaires et catalogues de vente, mise en exposition de la salle et participation aux ventes. Expertise d'œuvres anciennes et contemporaines.</div>
+        <div class="exp-tags">
+          <span class="exp-tag">Ventes aux enchères</span>
+          <span class="exp-tag">Expertise</span>
+          <span class="exp-tag">Catalogage</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-date"><span class="exp-dot"></span>Mai – Juin 2025</div>
+      <div class="exp-content">
+        <div class="exp-role">Chargé de recherche & valorisation</div>
+        <div class="exp-org">Association Patrimoine et Histoire · Boigny-sur-Bionne (45)</div>
+        <div class="exp-desc">Participation à la rédaction du Cahier du Patrimoine communal. Recherche historique approfondie sur la copie de <em>La Vierge aux Rochers</em> de Léonard de Vinci conservée dans l'église. Analyse architecturale et collaboration avec des experts du patrimoine.</div>
+        <div class="exp-tags">
+          <span class="exp-tag">Recherche archivistique</span>
+          <span class="exp-tag">Rédaction</span>
+          <span class="exp-tag">Analyse architecturale</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-date"><span class="exp-dot"></span>Depuis 2022</div>
+      <div class="exp-content">
+        <div class="exp-role">Animateur</div>
+        <div class="exp-org">Centre de loisirs</div>
+        <div class="exp-desc">Médiation et création de projets culturels avec un jeune public : conception d'expositions, visites patrimoniales et animation d'ateliers d'art. Gestion administrative et budgétaire des sorties.</div>
+        <div class="exp-tags">
+          <span class="exp-tag">Médiation culturelle</span>
+          <span class="exp-tag">Gestion de projet</span>
+          <span class="exp-tag">Pédagogie</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="formation">
+  <div class="section-label">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Formation</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="formation-grid">
+    <div class="formation-item reveal">
+      <div class="formation-year">2028-2026</div>
+      <div class="formation-degree">Mastère Marché international de l'Art</div>
+      <div class="formation-spec">Commerce et valorisation du marché de l'art. Articulation entre expertise historique et dynamiques économiques globales.</div>
+      <div class="formation-school">IESA Paris</div>
+    </div>
+    <div class="formation-item reveal" style="transition-delay:.1s">
+      <div class="formation-year">2026-2023</div>
+      <div class="formation-degree">Licence Histoire de l'Art & Archéologie</div>
+      <div class="formation-spec">Connaissance de la production ancienne et contemporaine · Option Histoire · Archéologie · Architecture.</div>
+      <div class="formation-school">Université Rennes 2 </div>
+    </div>
+    <div class="formation-item reveal" style="transition-delay:.2s">
+      <div class="formation-year">2023</div>
+      <div class="formation-degree">Baccalauréat général (Mention)</div>
+      <div class="formation-spec">Spécialités HGGSP, SES et HLP, option Droit. Un socle solide en sciences humaines et juridiques.</div>
+      <div class="formation-school">Lycée J. Monod · Orléans</div>
+    </div>
+  </div>
+</section>
+
+<section id="competences">
+  <div class="section-label">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Compétences & Langues</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="comp-grid">
+    <div class="comp-col">
+      <div class="comp-col-title">Compétences </div>
+      <ul class="comp-list">
+        <li class="comp-item">Analyse et traitement d'œuvres d'art</li>
+        <li class="comp-item">Recherche documentaire</li>
+        <li class="comp-item">Rédaction scientifique</li>
+        <li class="comp-item">Communication digitale</li>
+        <li class="comp-item">Certificat d'excellence LVMH</li>
+      </ul>
+    </div>
+    <div class="comp-col">
+      <div class="comp-col-title">Gestion & Savoir-être</div>
+      <ul class="comp-list">
+        <li class="comp-item">Gestion de projets culturels</li>
+        <li class="comp-item">Médiation </li>
+        <li class="comp-item">Esprit de synthèse & rigueur</li>
+        <li class="comp-item">Maîtrise des outils bureautiques</li>
+      </ul>
+    </div>
+    <div class="comp-col">
+      <div class="comp-col-title">Langues</div>
+      <ul class="comp-list">
+        <li class="comp-item">Français · Langue maternelle</li>
+        <li class="comp-item">Anglais · Intermédiaire (B1)</li>
+        <li class="comp-item">Italien · Élémentaire (A2)</li>
+        <li class="comp-item">Espagnol · Notions de base</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div id="contact">
+  <div class="contact-inner">
+    <div class="section-label" style="margin-bottom:4rem">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Contact</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <p class="contact-text">Actuellement à la recherche d'une alternance. Si vous cherchez un collaborateur passionné, rigoureux et déterminé, n'hésitez pas à me contacter.</p>
+      </div>
+      <div class="contact-links">
+        <a href="tel:0695990163" class="contact-link">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <div>
+            <span class="contact-link-label">Me joindre</span>
+            06 95 99 01 63
+          </div>
+        </a>
+        <a href="mailto:gillet.raphael.45@gmail.com" class="contact-link">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <div>
+            <span class="contact-link-label">Courriel</span>
+            gillet.raphael.45@gmail.com
+          </div>
+        </a>
+        <a href="https://www.linkedin.com/in/raphaël-gillet-255a1726b/" target="_blank" class="contact-link">
+          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          <div>
+            <span class="contact-link-label">Réseau professionnel</span>
+            Raphaël Gillet
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-copy">© 2026 Raphaël Gillet — Tous droits réservés</span>
+  <span class="footer-mark">À bientôt !</span>
+</footer>
+
+<script>
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = -100, my = -100, rx = -100, ry = -100;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+  cursor.style.transform = 'translate(-50%, -50%)';
+});
+
+function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  ring.style.transform = 'translate(-50%, -50%)';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button, .exp-item, .formation-item, nav').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('hover-mode'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('hover-mode'));
+});
+
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+const reveals = document.querySelectorAll('.reveal, .exp-item, .formation-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
